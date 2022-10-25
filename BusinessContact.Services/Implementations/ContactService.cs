@@ -6,7 +6,9 @@ using BusinessContact.DataAccess.Interfaces;
 using BusinessContact.Dto.Response;
 using BusinessContact.Entities;
 using BusinessContact.Services.Interfaces;
+using BusinessContact.Services.Util.Constants;
 using BusinessLogic.Dto.Request;
+using Microsoft.Extensions.Logging;
 
 namespace BusinessContact.Services.Implementations
 {
@@ -14,12 +16,13 @@ namespace BusinessContact.Services.Implementations
     {
         private readonly IContactRepository _repository;
         private readonly IMapper _mapper;
+        private readonly ILogger<ContactService> _logger;
 
-
-        public ContactService(IContactRepository repository, IMapper mapper)
+        public ContactService(IContactRepository repository, IMapper mapper, ILogger<ContactService> logger)
         {
             _repository = repository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<BaseResponseGeneric<ICollection<ContactResponse>>> GetListContact()
@@ -34,8 +37,9 @@ namespace BusinessContact.Services.Implementations
             }
             catch (Exception ex)
             {
+                _logger.LogCritical(ex.StackTrace);
                 response.Success = false;
-                response.Errors.Add(ex.Message);
+                response.Errors.Add(ErrorConstant.Message);
             }
 
             return response;
@@ -51,8 +55,9 @@ namespace BusinessContact.Services.Implementations
             }
             catch (Exception ex)
             {
+                _logger.LogCritical(ex.StackTrace);
                 response.Success = false;
-                response.Errors.Add(ex.Message);
+                response.Errors.Add(ErrorConstant.Message);
             }
             return response;
         }
@@ -71,11 +76,7 @@ namespace BusinessContact.Services.Implementations
                     return response;
                 }
 
-                contact.Name = request.Name;
-                contact.Phone = request.Phone;
-                contact.Address = request.Address;
-                contact.BusinessId = request.BusinessId;
-                contact.Email = request.Email;
+                _mapper.Map(request, contact);
 
                 await _repository.UpdateAsync();
 
@@ -83,8 +84,36 @@ namespace BusinessContact.Services.Implementations
             }
             catch (Exception ex)
             {
+                _logger.LogCritical(ex.StackTrace);
                 response.Success = false;
-                response.Errors.Add(ex.Message);
+                response.Errors.Add(ErrorConstant.Message);
+            }
+
+            return response;
+        }
+
+        public async Task<BaseResponse> DeleteAsync(int id)
+        {
+            var response = new BaseResponse();
+
+            try
+            {
+                var contact = await _repository.GetByIdAsync(id);
+
+                if (contact == null)
+                {
+                    response.Success = false;
+                    return response;
+                }
+
+                await _repository.DeleteAsync(id);
+                response.Success = true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex.StackTrace);
+                response.Success = false;
+                response.Errors.Add(ErrorConstant.Message);
             }
 
             return response;

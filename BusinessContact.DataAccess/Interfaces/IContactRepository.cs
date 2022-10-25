@@ -7,12 +7,14 @@ namespace BusinessContact.DataAccess.Interfaces
 {
     public interface IContactRepository
     {
-        public Task<ICollection<Contact>> GetListContact();
+        Task<ICollection<Contact>> GetListContact();
 
-        public  Task<int> CreateAsync(Contact contact);
+        Task<int> CreateAsync(Contact contact);
 
         Task<Contact?> GetByIdAsync(int id);
 
         Task UpdateAsync();
+
+        Task DeleteAsync(int id);
     }
 }

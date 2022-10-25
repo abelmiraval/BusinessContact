@@ -12,5 +12,7 @@ namespace BusinessContact.Services.Interfaces
         Task<BaseResponseGeneric<int>> CreateAsync(ContactRequest request);
 
         Task<BaseResponse> UpdateAsync(int id, ContactRequest request);
+
+        Task<BaseResponse> DeleteAsync(int id);
     }
 }

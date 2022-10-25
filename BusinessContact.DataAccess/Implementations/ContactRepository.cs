@@ -15,6 +15,12 @@ namespace BusinessContact.DataAccess.Implementations
             _context = context;
         }
 
+        public async Task<Contact?> GetByIdAsync(int id)
+        {
+            return await _context.Set<Contact>()
+                .AsTracking()
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
 
         public async Task<ICollection<Contact>> GetListContact()
         {
@@ -33,16 +39,17 @@ namespace BusinessContact.DataAccess.Implementations
             return contact.Id;
         }
 
-        public async Task<Contact?> GetByIdAsync(int id)
-        {
-            return await _context.Set<Contact>()
-                .AsTracking()
-                .FirstOrDefaultAsync(p => p.Id == id);
-        }
-
-
         public async Task UpdateAsync()
         {
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var entity = await GetByIdAsync(id);
+            if (entity != null)
+                entity.Status = false;
+
             await _context.SaveChangesAsync();
         }
 

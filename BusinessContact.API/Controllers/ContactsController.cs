@@ -49,5 +49,18 @@ namespace BusinessContact.API.Controllers
 
             return NotFound(response);
         }
+
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(typeof(BaseResponse), 200)]
+        [ProducesResponseType(typeof(BaseResponse), 400)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var response =await _service.DeleteAsync(id);
+
+            if (response.Success)
+                return Ok(response);
+
+            return NotFound(response);
+        }
     }
 }
